@@ -1,5 +1,8 @@
 # MessageQueue-C#-
-Contain
+It's a MQ dll file, use C# programming.
+
+It contain :
+
 * Interface
 > * MQEventListener
 > * MQreceiver
