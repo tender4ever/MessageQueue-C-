@@ -15,3 +15,5 @@ It contain :
 * MSMQ
 > * MSMQReceiver
 > * MSMQSender
+
+If you want to try this dll, you can use the project which name is MQTest.
