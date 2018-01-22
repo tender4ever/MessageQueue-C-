@@ -9,11 +9,14 @@ using AUOMQ.AUOInterface;
 
 namespace AUOMQ.MSMQ
 {
-    public class MSMQSender : MQsender  //實作MQsender
+    /// <summary>
+    /// MSMQSender類別
+    /// </summary>
+    /// <remarks>實作Interface MQsender</remarks>
+    public class MSMQSender : MQsender 
     {
         /*===================================================================================================================*/
         /*  MSMQ queuePath設定                                                                                               */
-        
         /*  String queuePath = @".\private$\myqueue"; //呼叫本機MSMQ                                                         */
         /*  String queuePath = @"FormatName:Direct=TCP:192.168.222.135\private$\myqueue"; //使用IP呼叫遠端MSMQ               */
         /*  String queuePath = @"FormatName:Direct=OS:STKC\private$\myqueue"; //使用Machine Name呼叫遠端MSMQ                 */
@@ -26,7 +29,12 @@ namespace AUOMQ.MSMQ
         private MessageQueue myQueue;                                   //宣告Queue
         private MQEventListener listener;                               //MQEventListener
 
-        //建構子
+        /// <summary>
+        /// MSMQSender建構子
+        /// </summary>
+        /// <param name="eventlistener"></param>
+        /// <param name="InputHostName"></param>
+        /// <param name="InputQueueName"></param>
         public MSMQSender(MQEventListener eventlistener,String InputHostName, String InputQueueName) 
         {
             this.hostName = InputHostName;                              //設定hostName
@@ -34,29 +42,43 @@ namespace AUOMQ.MSMQ
             listener = eventlistener;                                   //MQEventListener
             connect();                                                  //連線
         }
-        //建構子
+
+        /// <summary>
+        /// MSMQSender建構子
+        /// </summary>
+        /// <param name="eventlistener"></param>
+        /// <param name="InputHostName"></param>
         public MSMQSender(MQEventListener eventlistener, String InputHostName)
         {
             this.hostName = InputHostName;                              //設定hostName
             listener = eventlistener;                                   //MQEventListener
             connect();                                                  //連線
         }
-        //建構子
+
+        /// <summary>
+        /// MSMQSender建構子
+        /// </summary>
+        /// <param name="eventlistener"></param>
         public MSMQSender(MQEventListener eventlistener)
         {
             listener = eventlistener;                                   //MQEventListener
             connect();                                                  //連線
         }
         
-        //連線
+        /// <summary>
+        /// connect方法
+        /// </summary>
+        /// <remarks>連線</remarks>
         public void connect(){
             try
             {
                 queuePath = @"FormatName:Direct=TCP:" + hostName + @"\private$\" + queueName;       //設定queuePath
                 myQueue = new MessageQueue(queuePath);                                              //設定MessageQueue
                 connectionStatus = "Ready";                                                         //設連線狀態為Ready
-            }
-            catch (Exception e) 
+				listener.systemMessage("sender connect ok");
+				listener.connectMessage("sender connect");
+			}
+			catch (Exception e) 
             {
                 e.ToString();
                 listener.systemMessage("sender connect fail");                                     //輸出文字 連線失敗
@@ -64,13 +86,18 @@ namespace AUOMQ.MSMQ
             }
         }
         
-        //斷線
+        /// <summary>
+        /// disconnect方法
+        /// </summary>
+        /// <remarks>斷線</remarks>
         public  void disconnect() {
             try
             {
-                 myQueue.Close();
-                 myQueue = null;
-                 connectionStatus = "NotReady";                                                     //設連線狀態為NotReady
+                myQueue.Close();
+                myQueue = null;
+                connectionStatus = "NotReady";                                                     //設連線狀態為NotReady
+                listener.systemMessage("sender disconnect ok");
+				listener.connectMessage("sender disconnect");
             }
             catch (Exception e)
             {
@@ -79,6 +106,11 @@ namespace AUOMQ.MSMQ
             }
         }
         
+        /// <summary>
+        /// send方法
+        /// </summary>
+        /// <remarks>寄送message</remarks>
+        /// <param name="InputText"></param>
         public void send(String InputText){
             try
             {
